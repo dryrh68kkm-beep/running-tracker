@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ตารางวิ่ง 200 นาที/สัปดาห์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --clay: #BF4E35;
+    --clay-dark: #9B3B27;
+    --navy: #16213E;
+    --navy-2: #1F2C4E;
+    --lane: #E4B92B;
+    --chalk: #F3ECDD;
+    --ink: #20241F;
+    --grass: #5C7A5E;
+    --line: rgba(243,236,221,0.14);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: var(--navy);
+    background-image:
+      repeating-linear-gradient(180deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 40px);
+    color: var(--chalk);
+    font-family: 'Noto Sans Thai','Inter',sans-serif;
+    min-height:100vh;
+    padding-bottom: 60px;
+  }
+  h1,h2,h3, .num-display{ font-family:'Oswald','Noto Sans Thai',sans-serif; letter-spacing:0.02em; }
+  .mono{ font-family:'Space Mono', monospace; }
+
+  header{
+    padding: 28px 20px 18px;
+    text-align:center;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, var(--navy-2), var(--navy));
+  }
+  header .eyebrow{
+    text-transform:uppercase; letter-spacing:0.3em; font-size:11px; color: var(--lane);
+    font-weight:600;
+  }
+  header h1{ margin:6px 0 2px; font-size: 26px; font-weight:700; color: var(--chalk); }
+  header p{ margin:0; font-size:13px; color: rgba(243,236,221,0.6); }
+
+  .wrap{ max-width: 520px; margin: 0 auto; padding: 0 16px; }
+
+  /* Track hero */
+  .track-card{
+    margin: 22px 0;
+    background: var(--navy-2);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 22px 18px 14px;
+  }
+  .track-svg-wrap{ position:relative; width:100%; }
+  svg.track{ width:100%; height:auto; display:block; }
+  .track-center{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    text-align:center; width: 60%;
+  }
+  .track-center .big{ font-size: 42px; font-weight:700; color: var(--chalk); line-height:1; }
+  .track-center .goal{ font-size: 13px; color: rgba(243,236,221,0.55); margin-top:4px; }
+  .track-center .pct{ font-size: 12px; color: var(--lane); margin-top:6px; font-weight:700; letter-spacing:0.05em;}
+
+  .week-nav{ display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-size:12px; color:rgba(243,236,221,0.6); }
+  .week-nav b{ color: var(--chalk); }
+
+  /* Section cards */
+  .card{
+    background: rgba(243,236,221,0.04);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card h2{
+    margin:0 0 12px; font-size:15px; text-transform:uppercase; letter-spacing:0.12em;
+    color: var(--lane); font-weight:600; display:flex; align-items:center; gap:8px;
+  }
+  .card h2::before{ content:''; width:16px; height:2px; background:var(--clay); display:inline-block; }
+
+  /* Day plan grid */
+  .days{ display:grid; grid-template-columns: repeat(7,1fr); gap:6px; }
+  .day{
+    background: rgba(255,255,255,0.03);
+    border:1px solid var(--line);
+    border-radius: 10px;
+    padding: 8px 2px;
+    text-align:center;
+  }
+  .day .lbl{ font-size:10px; color:rgba(243,236,221,0.5); text-transform:uppercase; letter-spacing:0.05em;}
+  .day input{
+    width:100%; background:transparent; border:none; color:var(--chalk);
+    text-align:center; font-family:'Space Mono',monospace; font-size:14px; font-weight:700;
+    padding:4px 0; -moz-appearance:textfield;
+  }
+  .day input:focus{ outline:none; }
+  .day.done{ border-color: var(--grass); background: rgba(92,122,94,0.18); }
+  .day .fill{ height:3px; border-radius:2px; margin-top:4px; background: rgba(255,255,255,0.08); overflow:hidden;}
+  .day .fill i{ display:block; height:100%; background: var(--lane); }
+  .plan-total{ margin-top:10px; font-size:12px; color:rgba(243,236,221,0.6); text-align:right;}
+  .plan-total b{ color:var(--lane); font-family:'Space Mono',monospace; }
+
+  /* form rows */
+  label{ display:block; font-size:11px; color:rgba(243,236,221,0.55); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.05em;}
+  .row{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px; }
+  .row3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:10px; }
+  input[type=number], select{
+    width:100%; padding:10px 10px; border-radius:10px;
+    border:1px solid var(--line); background: rgba(0,0,0,0.2); color:var(--chalk);
+    font-family:'Space Mono',monospace; font-size:14px;
+  }
+  select{ font-family:'Noto Sans Thai',sans-serif; }
+  input:focus, select:focus{ outline:none; border-color: var(--lane); }
+
+  .btn{
+    width:100%; padding:12px; border-radius:12px; border:none; cursor:pointer;
+    background: var(--clay); color: var(--chalk); font-weight:700; font-size:14px;
+    font-family:'Noto Sans Thai',sans-serif; letter-spacing:0.02em;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  .btn:hover{ background: var(--clay-dark); }
+  .btn:active{ transform: scale(0.98); }
+  .btn.ghost{
+    background:transparent; border:1px solid var(--line); color:var(--chalk); font-weight:500;
+  }
+
+  .kcal-result{
+    margin-top:12px; padding:14px; border-radius:12px;
+    background: linear-gradient(135deg, rgba(191,78,53,0.25), rgba(228,185,43,0.12));
+    border: 1px solid rgba(228,185,43,0.35);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .kcal-result .label{ font-size:11px; color:rgba(243,236,221,0.6); text-transform:uppercase; letter-spacing:0.08em;}
+  .kcal-result .val{ font-size:26px; font-weight:700; font-family:'Space Mono',monospace; color:var(--lane); }
+  .kcal-note{ font-size:11px; color:rgba(243,236,221,0.45); margin-top:8px; line-height:1.5;}
+
+  /* log list */
+  .log-item{
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 10px 0; border-bottom: 1px solid var(--line); font-size:13px;
+  }
+  .log-item:last-child{ border-bottom:none; }
+  .log-item .meta{ color: rgba(243,236,221,0.55); font-size:11px; }
+  .log-item .kcal{ font-family:'Space Mono',monospace; color:var(--lane); font-weight:700; }
+  .log-item .del{ background:none; border:none; color: rgba(243,236,221,0.35); cursor:pointer; font-size:16px; padding:0 0 0 10px;}
+  .log-item .del:hover{ color: var(--clay); }
+  .empty{ text-align:center; color:rgba(243,236,221,0.4); font-size:13px; padding: 18px 0; }
+
+  .settings-toggle{ text-align:center; margin: 16px 0 4px; }
+  .settings-toggle button{
+    background:none; border:none; color:rgba(243,236,221,0.4); font-size:12px; cursor:pointer;
+    text-decoration:underline;
+  }
+  .hidden{ display:none; }
+  .loading{ text-align:center; padding: 40px 0; color: rgba(243,236,221,0.5); font-size:13px;}
+  .storage-banner{
+    background: rgba(191,78,53,0.15); border:1px solid rgba(191,78,53,0.4);
+    border-radius:12px; padding:10px 14px; margin: 14px 0; font-size:12px;
+    color: rgba(243,236,221,0.75); line-height:1.5;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Loss Prevention Runner</div>
+  <h1>ตารางวิ่งประจำสัปดาห์</h1>
+  <p>เป้าหมาย 200 นาที/สัปดาห์ · วางแผน บันทึก คำนวณแคลอรี่</p>
+</header>
+
+<div class="wrap" id="app">
+  <div class="loading">กำลังโหลดข้อมูล...</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'run-tracker-data';
+let state = null;
+
+function getMonday(d){
+  const date = new Date(d);
+  const day = date.getDay();
+  const diff = (day === 0 ? -6 : 1) - day;
+  date.setDate(date.getDate() + diff);
+  date.setHours(0,0,0,0);
+  return date;
+}
+function weekKey(d){
+  const mon = getMonday(d);
+  return mon.toISOString().slice(0,10);
+}
+function fmtDateShort(d){
+  return d.toLocaleDateString('th-TH', {day:'numeric', month:'short'});
+}
+const DOW = ['จ','อ','พ','พฤ','ศ','ส','อา'];
+const DOW_FULL = ['จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์','อาทิตย์'];
+
+function defaultWeek(){
+  return {
+    plan: {0:40,1:0,2:40,3:0,4:40,5:40,6:40}, // Mon..Sun minutes target
+    logs: []
+  };
+}
+
+let storageMode = 'memory'; // 'local' | 'cloud' | 'memory'
+let memoryCache = null;
+
+// ตรวจว่า localStorage ใช้ได้ไหม (ใช้ได้บน GitHub Pages / เบราว์เซอร์ปกติ)
+function localStorageAvailable(){
+  try{
+    const k = '__runtest__';
+    window.localStorage.setItem(k, '1');
+    window.localStorage.removeItem(k);
+    return true;
+  }catch(e){ return false; }
+}
+
+async function readStore(){
+  if(localStorageAvailable()){
+    storageMode = 'local';
+    const v = window.localStorage.getItem(STORAGE_KEY);
+    return v || null;
+  }
+  if(window.storage && window.storage.get){
+    try{
+      const res = await window.storage.get(STORAGE_KEY, false);
+      storageMode = 'cloud';
+      return res && res.value ? res.value : null;
+    }catch(e){ /* ตกไปที่ memory */ }
+  }
+  storageMode = 'memory';
+  return memoryCache;
+}
+
+async function writeStore(payload){
+  if(storageMode === 'local'){
+    window.localStorage.setItem(STORAGE_KEY, payload);
+    return;
+  }
+  if(storageMode === 'cloud' && window.storage && window.storage.set){
+    await window.storage.set(STORAGE_KEY, payload, false);
+    return;
+  }
+  memoryCache = payload;
+}
+
+async function loadState(){
+  let raw = null;
+  try{ raw = await readStore(); }catch(e){ raw = null; }
+  try{ state = raw ? JSON.parse(raw) : null; }catch(e){ state = null; }
+
+  if(!state){
+    state = { settings: { weightKg: 65, weeklyGoal: 200 }, weeks: {} };
+  }
+  if(!state.settings) state.settings = { weightKg:65, weeklyGoal:200 };
+  if(!state.weeks) state.weeks = {};
+  const wk = weekKey(new Date());
+  if(!state.weeks[wk]) state.weeks[wk] = defaultWeek();
+  state.currentWeek = wk;
+  render();
+}
+
+// เซฟแบบเข้าคิวทีละครั้ง กันคำสั่งซ้อนกัน
+let saveChain = Promise.resolve();
+let savePending = false;
+
+function saveState(){
+  memoryCache = JSON.stringify(state); // สำรองในหน่วยความจำเสมอ
+  if(savePending) return saveChain;
+  savePending = true;
+  saveChain = saveChain.then(async ()=>{
+    savePending = false;
+    try{
+      await writeStore(JSON.stringify(state));
+      hideBanner();
+    }catch(e){
+      storageMode = 'memory';
+      showBanner();
+    }
+  });
+  return saveChain;
+}
+
+function showBanner(){
+  const b = document.getElementById('storageBanner');
+  if(b) b.classList.remove('hidden');
+}
+function hideBanner(){
+  const b = document.getElementById('storageBanner');
+  if(b) b.classList.add('hidden');
+}
+
+function calcKcal(weightKg, speedKmh, inclinePct, minutes){
+  const speedMMin = speedKmh * 1000 / 60;
+  const grade = inclinePct / 100;
+  const vo2 = 0.2*speedMMin + 0.9*speedMMin*grade + 3.5; // ml/kg/min, ACSM running formula
+  const kcalPerMin = vo2 * weightKg / 200;
+  return Math.max(0, kcalPerMin * minutes);
+}
+
+function currentWeekData(){
+  return state.weeks[state.currentWeek];
+}
+
+function weekTotals(){
+  const wd = currentWeekData();
+  const loggedMin = wd.logs.reduce((s,l)=>s+l.minutes,0);
+  const loggedKcal = wd.logs.reduce((s,l)=>s+l.kcal,0);
+  const planTotal = Object.values(wd.plan).reduce((s,v)=>s+Number(v||0),0);
+  return { loggedMin, loggedKcal, planTotal };
+}
+
+function ovalTrackSVG(pct){
+  const p = Math.max(0, Math.min(1, pct));
+  const rx = 150, ry = 70, cx=160, cy=80;
+  const circumApprox = 2*Math.PI*Math.sqrt((rx*rx+ry*ry)/2);
+  const dash = circumApprox;
+  const offset = dash * (1-p);
+  return `
+  <svg class="track" viewBox="0 0 320 160" fill="none">
+    <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" stroke="rgba(243,236,221,0.12)" stroke-width="22"/>
+    <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" stroke="#E4B92B" stroke-width="22"
+      stroke-dasharray="${dash}" stroke-dashoffset="${offset}" stroke-linecap="round"
+      transform="rotate(-90 ${cx} ${cy})"/>
+  </svg>`;
+}
+
+function render(){
+  const app = document.getElementById('app');
+  const wd = currentWeekData();
+  const { loggedMin, loggedKcal, planTotal } = weekTotals();
+  const goal = state.settings.weeklyGoal;
+  const pct = Math.min(1, loggedMin/goal);
+  const mon = getMonday(new Date(state.currentWeek));
+  const sun = new Date(mon); sun.setDate(sun.getDate()+6);
+
+  app.innerHTML = `
+    <div class="storage-banner ${storageMode==='memory' ? '' : 'hidden'}" id="storageBanner">
+      ⚠️ โหมดชั่วคราว: หน้าต่างนี้เก็บข้อมูลถาวรไม่ได้ ข้อมูลจะหายเมื่อปิด — แนะนำให้เปิดไฟล์นี้บน GitHub Pages หรือเบราว์เซอร์ปกติเพื่อให้บันทึกสะสมได้
+    </div>
+    <div class="track-card">
+      <div class="track-svg-wrap">
+        ${ovalTrackSVG(pct)}
+        <div class="track-center">
+          <div class="big mono">${loggedMin}<span style="font-size:16px;color:rgba(243,236,221,0.5)">/${goal}</span></div>
+          <div class="goal">นาทีสัปดาห์นี้</div>
+          <div class="pct">${Math.round(pct*100)}% ของเป้าหมาย</div>
+        </div>
+      </div>
+      <div class="week-nav">
+        <span>${fmtDateShort(mon)} – ${fmtDateShort(sun)}</span>
+        <span>เผาผลาญรวม <b class="mono">${Math.round(loggedKcal)}</b> kcal</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>แผนวิ่งรายสัปดาห์</h2>
+      <div class="days" id="planDays">
+        ${DOW.map((d,i)=>{
+          const target = wd.plan[i]||0;
+          const doneMin = wd.logs.filter(l=>l.dow===i).reduce((s,l)=>s+l.minutes,0);
+          const fillPct = target>0 ? Math.min(100, Math.round(doneMin/target*100)) : 0;
+          const doneClass = target>0 && doneMin>=target ? 'done' : '';
+          return `<div class="day ${doneClass}">
+            <div class="lbl">${d}</div>
+            <input type="number" min="0" step="5" value="${target}" data-dow="${i}" class="plan-input"/>
+            <div class="fill"><i style="width:${fillPct}%"></i></div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="plan-total">รวมแผน: <b>${planTotal}</b> นาที ${planTotal!==goal ? `<span style="color:rgba(243,236,221,0.4)">(เป้าหมาย ${goal})</span>`:''}</div>
+    </div>
+
+    <div class="card">
+      <h2>คำนวณแคลอรี่ &amp; บันทึกการวิ่ง</h2>
+      <div class="row3">
+        <div>
+          <label>น้ำหนัก (กก.)</label>
+          <input type="number" id="inWeight" value="${state.settings.weightKg}" min="30" max="200" step="0.5"/>
+        </div>
+        <div>
+          <label>ความเร็ว (กม./ชม.)</label>
+          <input type="number" id="inSpeed" value="8" min="3" max="20" step="0.5"/>
+        </div>
+        <div>
+          <label>ความชัน (%)</label>
+          <input type="number" id="inIncline" value="8" min="0" max="20" step="1"/>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>ระยะเวลา (นาที)</label>
+          <input type="number" id="inMinutes" value="40" min="1" max="180" step="1"/>
+        </div>
+        <div>
+          <label>วัน</label>
+          <select id="inDow">
+            ${DOW_FULL.map((d,i)=>`<option value="${i}">${d}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="kcal-result">
+        <div>
+          <div class="label">แคลอรี่โดยประมาณ</div>
+        </div>
+        <div class="val mono" id="kcalPreview">0</div>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button class="btn" id="btnAddLog">＋ บันทึกลงตาราง</button>
+      </div>
+      <div class="kcal-note">คำนวณจากสูตร ACSM: VO₂ = 0.2×ความเร็ว + 0.9×ความเร็ว×ความชัน + 3.5 แล้วแปลงเป็นแคลอรี่ตามน้ำหนักตัว ใช้ได้แม่นสุดกับการวิ่ง (ไม่ใช่เดิน) ที่ความเร็วปานกลางขึ้นไป</div>
+    </div>
+
+    <div class="card">
+      <h2>บันทึกสัปดาห์นี้</h2>
+      <div id="logList">
+        ${wd.logs.length===0 ? '<div class="empty">ยังไม่มีบันทึกการวิ่งสัปดาห์นี้</div>' :
+          wd.logs.slice().reverse().map(l=>`
+            <div class="log-item">
+              <div>
+                <div>${DOW_FULL[l.dow]} · ${l.minutes} นาที</div>
+                <div class="meta">${l.speedKmh} กม./ชม. · ความชัน ${l.inclinePct}%</div>
+              </div>
+              <div style="display:flex; align-items:center;">
+                <div class="kcal">${Math.round(l.kcal)} kcal</div>
+                <button class="del" data-id="${l.id}">×</button>
+              </div>
+            </div>
+          `).join('')
+        }
+      </div>
+    </div>
+
+    <div class="settings-toggle">
+      <button id="toggleSettings">ตั้งค่าน้ำหนัก / เป้าหมายสัปดาห์</button>
+    </div>
+    <div class="card hidden" id="settingsCard">
+      <h2>ตั้งค่า</h2>
+      <div class="row">
+        <div>
+          <label>น้ำหนักตัว (กก.)</label>
+          <input type="number" id="settWeight" value="${state.settings.weightKg}" min="30" max="200" step="0.5"/>
+        </div>
+        <div>
+          <label>เป้าหมายต่อสัปดาห์ (นาที)</label>
+          <input type="number" id="settGoal" value="${state.settings.weeklyGoal}" min="30" max="1000" step="10"/>
+        </div>
+      </div>
+      <button class="btn ghost" id="btnSaveSettings">บันทึกการตั้งค่า</button>
+    </div>
+  `;
+
+  // wire events
+  document.querySelectorAll('.plan-input').forEach(inp=>{
+    inp.addEventListener('change', async (e)=>{
+      const dow = Number(e.target.dataset.dow);
+      wd.plan[dow] = Number(e.target.value)||0;
+      await saveState();
+      render();
+    });
+  });
+
+  function updatePreview(){
+    const w = Number(document.getElementById('inWeight').value)||0;
+    const s = Number(document.getElementById('inSpeed').value)||0;
+    const inc = Number(document.getElementById('inIncline').value)||0;
+    const m = Number(document.getElementById('inMinutes').value)||0;
+    const kcal = calcKcal(w,s,inc,m);
+    document.getElementById('kcalPreview').textContent = Math.round(kcal);
+  }
+  ['inWeight','inSpeed','inIncline','inMinutes'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', updatePreview);
+  });
+  updatePreview();
+
+  document.getElementById('btnAddLog').addEventListener('click', async ()=>{
+    const w = Number(document.getElementById('inWeight').value)||0;
+    const s = Number(document.getElementById('inSpeed').value)||0;
+    const inc = Number(document.getElementById('inIncline').value)||0;
+    const m = Number(document.getElementById('inMinutes').value)||0;
+    const dow = Number(document.getElementById('inDow').value);
+    if(m<=0 || s<=0 || w<=0) return;
+    const kcal = calcKcal(w,s,inc,m);
+    wd.logs.push({ id: Date.now()+'-'+Math.random().toString(36).slice(2,7), dow, minutes:m, speedKmh:s, inclinePct:inc, kcal, loggedAt: new Date().toISOString() });
+    state.settings.weightKg = w;
+    await saveState();
+    render();
+  });
+
+  document.querySelectorAll('.del').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      const id = e.target.dataset.id;
+      wd.logs = wd.logs.filter(l=>l.id!==id);
+      await saveState();
+      render();
+    });
+  });
+
+  document.getElementById('toggleSettings').addEventListener('click', ()=>{
+    document.getElementById('settingsCard').classList.toggle('hidden');
+  });
+  document.getElementById('btnSaveSettings').addEventListener('click', async ()=>{
+    state.settings.weightKg = Number(document.getElementById('settWeight').value)||state.settings.weightKg;
+    state.settings.weeklyGoal = Number(document.getElementById('settGoal').value)||state.settings.weeklyGoal;
+    await saveState();
+    render();
+  });
+}
+
+loadState();
+</script>
+</body>
+</html>
